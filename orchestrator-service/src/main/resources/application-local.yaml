@@ -1,0 +1,21 @@
+# Profile: local — IntelliJ / CLI dev, all downstream on localhost
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+downstream:
+  mdm:
+    base-url: http://localhost:8084
+  ccsl:
+    base-url: http://localhost:8082
+
+server:
+  port: 8086
+
+logging:
+  level:
+    com.banking.platform: DEBUG
+

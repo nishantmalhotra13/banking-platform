@@ -1,0 +1,18 @@
+# Profile: docker — inside Docker network, service names as hosts
+
+spring:
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+downstream:
+  mdm:
+    base-url: http://mdm-service:8084
+  ccsl:
+    base-url: http://ccsl-service:8082
+
+logging:
+  level:
+    com.banking.platform: INFO
+

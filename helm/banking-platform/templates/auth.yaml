@@ -1,0 +1,52 @@
+{{- range $name, $auth := .Values.auth }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-auth
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app: {{ $name }}-auth
+spec:
+  replicas: {{ $auth.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}-auth
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}-auth
+    spec:
+      containers:
+        - name: {{ $name }}-auth
+          image: {{ $auth.image }}
+          ports:
+            - containerPort: {{ $auth.port }}
+          resources:
+            requests:
+              cpu: {{ $.Values.resources.requests.cpu }}
+              memory: {{ $.Values.resources.requests.memory }}
+            limits:
+              cpu: {{ $.Values.resources.limits.cpu }}
+              memory: {{ $.Values.resources.limits.memory }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ $auth.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-auth
+  namespace: {{ $.Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ $name }}-auth
+  ports:
+    - port: {{ $auth.port }}
+      targetPort: {{ $auth.port }}
+{{- end }}
+

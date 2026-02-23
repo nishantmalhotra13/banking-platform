@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'banking-platform'
+
+include 'common'
+include 'api-gateway'
+include 'orchestrator-service'
+include 'mdm-service'
+include 'ccsl-service'
+include 'orchestrator-auth'
+include 'mdm-auth'
+include 'ccsl-auth'
+include 'e2e-tests'

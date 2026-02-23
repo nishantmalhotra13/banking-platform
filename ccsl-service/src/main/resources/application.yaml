@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ccsl-service
+  datasource:
+    url: jdbc:postgresql://localhost:5434/ccsl_db
+    username: ccsl_user
+    password: ccsl_pass
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 3000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  port: 8082
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  info:
+    title: CCSL Service API
+    description: Card Services Layer — tokenization, card lookup & validation
+    version: 1.0.0

@@ -1,0 +1,13 @@
+# Profile: docker — service runs inside Docker network
+# DB hostname is the docker-compose service name, port is internal 5432
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-mdm:5432/mdm_db
+    username: mdm_user
+    password: mdm_pass
+
+logging:
+  level:
+    com.banking.platform: INFO
+

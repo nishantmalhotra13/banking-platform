@@ -1,0 +1,7 @@
+# Profile: local
+server:
+  port: 8081
+logging:
+  level:
+    com.banking.platform: DEBUG
+

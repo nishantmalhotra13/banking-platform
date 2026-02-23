@@ -1,0 +1,35 @@
+# Profile: local — IntelliJ / CLI dev, routes to localhost services
+
+spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: orchestrator-search
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/search/**
+          - id: orchestrator-accounts
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/accounts/**
+          - id: orchestrator-cards
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/cards/**
+          - id: orchestrator-health
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/health/**
+          - id: auth
+            uri: http://localhost:8085
+            predicates:
+              - Path=/auth/**
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.banking.platform: DEBUG
+

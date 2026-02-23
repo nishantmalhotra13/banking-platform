@@ -1,0 +1,12 @@
+# Profile: docker — service runs inside Docker network
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-ccsl:5432/ccsl_db
+    username: ccsl_user
+    password: ccsl_pass
+
+logging:
+  level:
+    com.banking.platform: INFO
+

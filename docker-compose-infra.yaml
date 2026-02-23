@@ -1,0 +1,73 @@
+# Infrastructure-only compose — for running services locally in IntelliJ
+# Usage: docker compose -f docker-compose-infra.yaml up -d
+# Then run each service from IntelliJ with profile=local
+
+
+networks:
+  banking-net:
+    driver: bridge
+
+services:
+
+  postgres-mdm:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mdm_db
+      POSTGRES_USER: mdm_user
+      POSTGRES_PASSWORD: mdm_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./.docker-data/pgdata-mdm:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm_user -d mdm_db"]
+      interval: 10s
+      retries: 5
+
+  postgres-ccsl:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ccsl_db
+      POSTGRES_USER: ccsl_user
+      POSTGRES_PASSWORD: ccsl_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./.docker-data/pgdata-ccsl:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ccsl_user -d ccsl_db"]
+      interval: 10s
+      retries: 5
+
+  postgres-auth:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./.docker-data/pgdata-auth:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+

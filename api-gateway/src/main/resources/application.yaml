@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: orchestrator-search
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/search/**
+          - id: orchestrator-accounts
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/accounts/**
+          - id: orchestrator-cards
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/cards/**
+          - id: orchestrator-health
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/v1/health/**
+          - id: auth
+            uri: http://localhost:8085
+            predicates:
+              - Path=/auth/**
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+auth:
+  jwt:
+    secret: ThisIsAVeryLongSecretKeyForHS256AlgorithmMustBe32BytesOrMore!!
+
+# Downstream service base URLs (used by DocsProxyController)
+services:
+  orchestrator-url: http://localhost:8086
+  mdm-url: http://localhost:8084
+  ccsl-url: http://localhost:8082
+  auth-url: http://localhost:8085
+
+server:
+  port: 8080
+  shutdown: graceful
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    config-url: /api/v1/swagger-config

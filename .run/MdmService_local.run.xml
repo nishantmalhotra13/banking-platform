@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MdmService [local]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="banking-platform.mdm-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.banking.platform.mdm.MdmServiceApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
+

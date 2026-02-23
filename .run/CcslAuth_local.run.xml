@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CcslAuth [local]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="banking-platform.ccsl-auth.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.banking.platform.auth.ccsl.CcslAuthApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
+

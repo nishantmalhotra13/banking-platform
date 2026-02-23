@@ -1,0 +1,18 @@
+# Profile: local — IntelliJ / CLI dev against Docker infra on localhost
+# Activates with: --spring.profiles.active=local  (or SPRING_PROFILES_ACTIVE=local)
+# Expects: docker infra running via `make infra-up`
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mdm_db
+    username: mdm_user
+    password: mdm_pass
+
+server:
+  port: 8084
+
+logging:
+  level:
+    com.banking.platform: DEBUG
+    org.hibernate.SQL: DEBUG
+

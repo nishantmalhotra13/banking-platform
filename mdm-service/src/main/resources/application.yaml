@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: mdm-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mdm_db
+    username: mdm_user
+    password: mdm_pass
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 3000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  port: 8084
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  info:
+    title: MDM Service API
+    description: Master Data Management — account search & lookup
+    version: 1.0.0

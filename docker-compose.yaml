@@ -1,0 +1,235 @@
+
+networks:
+  banking-net:
+    driver: bridge
+
+services:
+
+  # ---------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------
+
+  postgres-mdm:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mdm_db
+      POSTGRES_USER: mdm_user
+      POSTGRES_PASSWORD: mdm_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./.docker-data/pgdata-mdm:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdm_user -d mdm_db"]
+      interval: 10s
+      retries: 5
+
+  postgres-ccsl:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ccsl_db
+      POSTGRES_USER: ccsl_user
+      POSTGRES_PASSWORD: ccsl_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./.docker-data/pgdata-ccsl:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ccsl_user -d ccsl_db"]
+      interval: 10s
+      retries: 5
+
+  postgres-auth:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./.docker-data/pgdata-auth:/var/lib/postgresql/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./.docker-data/esdata:/usr/share/elasticsearch/data
+    networks:
+      - banking-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      retries: 5
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    volumes:
+      - ./infra/elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./infra/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    ports:
+      - "5044:5000"
+    networks:
+      - banking-net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - banking-net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------
+  # Auth Services (1 replica each)
+  # ---------------------------------------------------------------
+
+  ccsl-auth:
+    build:
+      context: .
+      dockerfile: ccsl-auth/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8081"
+    networks:
+      - banking-net
+
+  mdm-auth:
+    build:
+      context: .
+      dockerfile: mdm-auth/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8083:8083"
+    networks:
+      - banking-net
+
+  orchestrator-auth:
+    build:
+      context: .
+      dockerfile: orchestrator-auth/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_pass
+    ports:
+      - "8085:8085"
+    networks:
+      - banking-net
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------
+  # Business Services (2 replicas each via deploy)
+  # ---------------------------------------------------------------
+
+  mdm-service:
+    build:
+      context: .
+      dockerfile: mdm-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-mdm:5432/mdm_db
+      SPRING_DATASOURCE_USERNAME: mdm_user
+      SPRING_DATASOURCE_PASSWORD: mdm_pass
+    networks:
+      - banking-net
+    deploy:
+      replicas: 1
+    depends_on:
+      postgres-mdm:
+        condition: service_healthy
+
+  ccsl-service:
+    build:
+      context: .
+      dockerfile: ccsl-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-ccsl:5432/ccsl_db
+      SPRING_DATASOURCE_USERNAME: ccsl_user
+      SPRING_DATASOURCE_PASSWORD: ccsl_pass
+    networks:
+      - banking-net
+    deploy:
+      replicas: 1
+    depends_on:
+      postgres-ccsl:
+        condition: service_healthy
+
+  orchestrator-service:
+    build:
+      context: .
+      dockerfile: orchestrator-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_REDIS_HOST: redis
+      DOWNSTREAM_MDM_BASE-URL: http://mdm-service:8084
+      DOWNSTREAM_CCSL_BASE-URL: http://ccsl-service:8082
+    networks:
+      - banking-net
+    deploy:
+      replicas: 1
+    depends_on:
+      redis:
+        condition: service_healthy
+      mdm-service:
+        condition: service_started
+      ccsl-service:
+        condition: service_started
+
+  # ---------------------------------------------------------------
+  # API Gateway (1 replica)
+  # ---------------------------------------------------------------
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    networks:
+      - banking-net
+    depends_on:
+      - orchestrator-service
+      - orchestrator-auth
+

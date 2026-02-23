@@ -1,0 +1,58 @@
+<h1>Search Accounts</h1>
+
+<mat-tab-group (selectedTabChange)="onTabChange($event)">
+  <mat-tab label="Phone">
+    <div class="search-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput [(ngModel)]="phoneValue" (keyup.enter)="searchPhone()">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="searchPhone()" [disabled]="loading">Search</button>
+    </div>
+  </mat-tab>
+  <mat-tab label="Name">
+    <div class="search-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Full Name</mat-label>
+        <input matInput [(ngModel)]="nameValue" (keyup.enter)="searchName()">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="searchName()" [disabled]="loading">Search</button>
+    </div>
+  </mat-tab>
+  <mat-tab label="Email">
+    <div class="search-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <input matInput [(ngModel)]="emailValue" (keyup.enter)="searchEmail()">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="searchEmail()" [disabled]="loading">Search</button>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+<mat-spinner *ngIf="loading" diameter="40" class="spinner"></mat-spinner>
+
+<div *ngIf="results.length > 0 && !loading" class="results">
+  <h2>Results ({{ results.length }} account{{ results.length > 1 ? 's' : '' }})</h2>
+  <table mat-table [dataSource]="results" class="full-width">
+    <ng-container matColumnDef="accountNumber">
+      <th mat-header-cell *matHeaderCellDef>Account #</th>
+      <td mat-cell *matCellDef="let r">
+        <a (click)="goToAccount(r.accountNumber)" class="link">{{ r.accountNumber }}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="productCode">
+      <th mat-header-cell *matHeaderCellDef>Product</th>
+      <td mat-cell *matCellDef="let r">{{ r.productCode }}</td>
+    </ng-container>
+    <ng-container matColumnDef="cards">
+      <th mat-header-cell *matHeaderCellDef>Cards</th>
+      <td mat-cell *matCellDef="let r">{{ r.cards?.length || 0 }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goToAccount(row.accountNumber)" class="clickable"></tr>
+  </table>
+</div>
+
+<p *ngIf="searched && results.length === 0 && !loading" class="no-results">No results found.</p>
+

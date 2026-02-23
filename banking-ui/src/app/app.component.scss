@@ -1,0 +1,39 @@
+.toolbar {
+  position: fixed;
+  z-index: 2;
+}
+
+.logo {
+  cursor: pointer;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.username {
+  margin-right: 16px;
+  font-size: 14px;
+}
+
+.container {
+  position: absolute;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.sidenav {
+  width: 240px;
+}
+
+.content {
+  padding: 24px;
+}
+
+mat-icon {
+  margin-right: 8px;
+}

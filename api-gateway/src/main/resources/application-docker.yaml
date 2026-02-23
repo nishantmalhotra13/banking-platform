@@ -1,0 +1,39 @@
+# Profile: docker — inside Docker network, route to docker service names
+
+spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: orchestrator-search
+            uri: http://orchestrator-service:8086
+            predicates:
+              - Path=/api/v1/search/**
+          - id: orchestrator-accounts
+            uri: http://orchestrator-service:8086
+            predicates:
+              - Path=/api/v1/accounts/**
+          - id: orchestrator-cards
+            uri: http://orchestrator-service:8086
+            predicates:
+              - Path=/api/v1/cards/**
+          - id: orchestrator-health
+            uri: http://orchestrator-service:8086
+            predicates:
+              - Path=/api/v1/health/**
+          - id: auth
+            uri: http://orchestrator-auth:8085
+            predicates:
+              - Path=/auth/**
+
+# Downstream service base URLs (used by DocsProxyController)
+services:
+  orchestrator-url: http://orchestrator-service:8086
+  mdm-url: http://mdm-service:8084
+  ccsl-url: http://ccsl-service:8082
+  auth-url: http://orchestrator-auth:8085
+
+logging:
+  level:
+    com.banking.platform: INFO
+

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: mdm-auth
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+auth:
+  jwt:
+    secret: MdmAuthSecretKeyForHS256MustBeAtLeast32BytesLong!!!
+    expiration-ms: 300000
+
+server:
+  port: 8083
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

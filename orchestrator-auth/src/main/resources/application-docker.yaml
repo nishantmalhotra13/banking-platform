@@ -1,0 +1,12 @@
+# Profile: docker — inside Docker network
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-auth:5432/auth_db
+    username: auth_user
+    password: auth_pass
+
+logging:
+  level:
+    com.banking.platform: INFO
+

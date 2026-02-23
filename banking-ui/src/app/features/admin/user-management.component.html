@@ -1,0 +1,33 @@
+<h1>User Management</h1>
+
+<mat-spinner *ngIf="loading" diameter="40"></mat-spinner>
+
+<table mat-table [dataSource]="users" class="full-width" *ngIf="!loading">
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef>Username</th>
+    <td mat-cell *matCellDef="let u">{{ u.username }}</td>
+  </ng-container>
+  <ng-container matColumnDef="fullName">
+    <th mat-header-cell *matHeaderCellDef>Full Name</th>
+    <td mat-cell *matCellDef="let u">{{ u.fullName }}</td>
+  </ng-container>
+  <ng-container matColumnDef="email">
+    <th mat-header-cell *matHeaderCellDef>Email</th>
+    <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+  </ng-container>
+  <ng-container matColumnDef="role">
+    <th mat-header-cell *matHeaderCellDef>Role</th>
+    <td mat-cell *matCellDef="let u"><mat-chip>{{ u.role }}</mat-chip></td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let u">
+      <button mat-button color="accent" (click)="toggleRole(u)">
+        {{ u.role === 'ADMIN' ? 'Demote to USER' : 'Promote to ADMIN' }}
+      </button>
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="cols"></tr>
+  <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+</table>
+

@@ -1,0 +1,15 @@
+# Profile: local — IntelliJ / CLI dev against Docker infra on localhost
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/auth_db
+    username: auth_user
+    password: auth_pass
+
+server:
+  port: 8085
+
+logging:
+  level:
+    com.banking.platform: DEBUG
+

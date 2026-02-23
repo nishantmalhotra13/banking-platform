@@ -1,0 +1,57 @@
+<mat-spinner *ngIf="loading" diameter="40"></mat-spinner>
+
+<div *ngIf="summary && !loading">
+  <h1>Account: {{ summary.accountNumber }}</h1>
+  <mat-card class="summary-card">
+    <div class="detail-grid">
+      <div><strong>Name:</strong> {{ summary.name }}</div>
+      <div><strong>Product:</strong> {{ summary.productCode }}</div>
+      <div><strong>Phone:</strong> {{ summary.phone }}</div>
+      <div><strong>Email:</strong> {{ summary.email }}</div>
+      <div><strong>Status:</strong> <mat-chip [class.active]="summary.status === 'ACTIVE'">{{ summary.status }}</mat-chip></div>
+      <div><strong>Branch:</strong> {{ summary.branchCode }}</div>
+    </div>
+  </mat-card>
+
+  <h2>Cards</h2>
+  <mat-tab-group>
+    <mat-tab label="All Cards ({{ summary.cards.length }})">
+      <ng-container *ngTemplateOutlet="cardTable; context: { cards: summary.cards }"></ng-container>
+    </mat-tab>
+    <mat-tab label="Credit ({{ creditCards.length }})">
+      <ng-container *ngTemplateOutlet="cardTable; context: { cards: creditCards }"></ng-container>
+    </mat-tab>
+    <mat-tab label="Debit ({{ debitCards.length }})">
+      <ng-container *ngTemplateOutlet="cardTable; context: { cards: debitCards }"></ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<ng-template #cardTable let-cards="cards">
+  <table mat-table [dataSource]="cards" class="full-width" *ngIf="cards.length > 0">
+    <ng-container matColumnDef="cardNumber">
+      <th mat-header-cell *matHeaderCellDef>Card Number</th>
+      <td mat-cell *matCellDef="let c">{{ maskCard(c.cardNumber) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="cardType">
+      <th mat-header-cell *matHeaderCellDef>Type</th>
+      <td mat-cell *matCellDef="let c">{{ c.cardType }}</td>
+    </ng-container>
+    <ng-container matColumnDef="cardCategory">
+      <th mat-header-cell *matHeaderCellDef>Category</th>
+      <td mat-cell *matCellDef="let c">{{ c.cardCategory }}</td>
+    </ng-container>
+    <ng-container matColumnDef="cardStatus">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let c"><mat-chip>{{ c.cardStatus }}</mat-chip></td>
+    </ng-container>
+    <ng-container matColumnDef="issuerBank">
+      <th mat-header-cell *matHeaderCellDef>Issuer</th>
+      <td mat-cell *matCellDef="let c">{{ c.issuerBank }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="cardCols"></tr>
+    <tr mat-row *matRowDef="let row; columns: cardCols;"></tr>
+  </table>
+  <p *ngIf="cards.length === 0" class="no-cards">No cards found.</p>
+</ng-template>
+

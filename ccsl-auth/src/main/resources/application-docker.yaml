@@ -1,0 +1,5 @@
+# Profile: docker
+logging:
+  level:
+    com.banking.platform: INFO
+

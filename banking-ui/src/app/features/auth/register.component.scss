@@ -1,0 +1,21 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 120px);
+}
+
+.register-card {
+  width: 400px;
+  padding: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 16px;
+}
+

@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ApiGateway [local]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="banking-platform.api-gateway.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.banking.platform.gateway.ApiGatewayApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
+

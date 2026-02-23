@@ -1,0 +1,41 @@
+<h1>Welcome, {{ auth.currentUser }}</h1>
+<p class="role-badge">Role: <mat-chip>{{ auth.isAdmin ? 'ADMIN' : 'USER' }}</mat-chip></p>
+
+<div class="actions">
+  <mat-card class="action-card" routerLink="/search">
+    <mat-icon>search</mat-icon>
+    <h3>Search Accounts</h3>
+    <p>Search by phone, name, or email</p>
+  </mat-card>
+  <mat-card class="action-card" routerLink="/cards/validate">
+    <mat-icon>credit_card</mat-icon>
+    <h3>Validate Card</h3>
+    <p>Check if a card number is valid</p>
+  </mat-card>
+  <mat-card class="action-card" *ngIf="auth.isAdmin" routerLink="/admin/users">
+    <mat-icon>admin_panel_settings</mat-icon>
+    <h3>User Management</h3>
+    <p>Manage users and roles</p>
+  </mat-card>
+</div>
+
+<h2>System Health</h2>
+<mat-card *ngIf="health" class="health-card">
+  <p>Overall:
+    <strong [class.up]="health.overallStatus === 'UP'" [class.down]="health.overallStatus !== 'UP'">
+      {{ health.overallStatus }}
+    </strong>
+  </p>
+  <div *ngFor="let svc of healthServices">
+    <span>{{ svc[0] }}: </span>
+    <strong [class.up]="!svc[1].includes('DOWN')">{{ svc[1] | slice:0:50 }}</strong>
+  </div>
+</mat-card>
+
+<h2>Quick Links</h2>
+<mat-card *ngIf="links" class="links-card">
+  <div *ngFor="let link of linkEntries">
+    <a [href]="link[1]" target="_blank">{{ link[0] }}</a>
+  </div>
+</mat-card>
+

@@ -1,0 +1,50 @@
+.actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+.action-card {
+  cursor: pointer;
+  padding: 24px;
+  width: 250px;
+  text-align: center;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #1a237e;
+  }
+}
+
+.health-card,
+.links-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.up {
+  color: green;
+}
+
+.down {
+  color: red;
+}
+
+a {
+  color: #00897b;
+  text-decoration: none;
+  display: block;
+  margin: 4px 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+

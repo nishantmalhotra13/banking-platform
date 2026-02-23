@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.infra.redis.replicas }}
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.infra.redis.image }}
+          ports:
+            - containerPort: {{ .Values.infra.redis.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - port: {{ .Values.infra.redis.port }}
+      targetPort: {{ .Values.infra.redis.port }}
+

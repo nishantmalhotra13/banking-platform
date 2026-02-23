@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: orchestrator-service
+  threads:
+    virtual:
+      enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  port: 8086
+  shutdown: graceful
+
+downstream:
+  mdm:
+    base-url: http://localhost:8084
+  ccsl:
+    base-url: http://localhost:8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  info:
+    title: Orchestrator Service API
+    description: Central orchestration — search, cards, account summary
+    version: 1.0.0

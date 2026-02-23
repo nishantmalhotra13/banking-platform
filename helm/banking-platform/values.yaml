@@ -1,0 +1,73 @@
+# All replicas are configurable — edit values here and `helm upgrade`
+
+namespace: banking-platform
+
+services:
+  orchestrator:
+    replicas: 2
+    port: 8086
+    image: banking-platform/orchestrator-service:latest
+  mdm:
+    replicas: 2
+    port: 8084
+    image: banking-platform/mdm-service:latest
+  ccsl:
+    replicas: 2
+    port: 8082
+    image: banking-platform/ccsl-service:latest
+  gateway:
+    replicas: 1
+    port: 8080
+    image: banking-platform/api-gateway:latest
+
+auth:
+  orchestrator:
+    replicas: 1
+    port: 8085
+    image: banking-platform/orchestrator-auth:latest
+  mdm:
+    replicas: 1
+    port: 8083
+    image: banking-platform/mdm-auth:latest
+  ccsl:
+    replicas: 1
+    port: 8081
+    image: banking-platform/ccsl-auth:latest
+
+ui:
+  replicas: 1
+  port: 80
+  image: banking-platform/banking-ui:latest
+
+infra:
+  redis:
+    replicas: 1
+    port: 6379
+    image: redis:7-alpine
+  postgresmdm:
+    port: 5432
+    image: postgres:15
+    dbName: mdm_db
+    dbUser: mdm_user
+    dbPass: mdm_pass
+  postgresccsl:
+    port: 5432
+    image: postgres:15
+    dbName: ccsl_db
+    dbUser: ccsl_user
+    dbPass: ccsl_pass
+  postgresauth:
+    port: 5432
+    image: postgres:15
+    dbName: auth_db
+    dbUser: auth_user
+    dbPass: auth_pass
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+

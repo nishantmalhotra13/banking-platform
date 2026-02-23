@@ -1,0 +1,35 @@
+.search-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.spinner {
+  margin: 24px auto;
+}
+
+.link {
+  color: #1a237e;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+}
+
+.no-results {
+  text-align: center;
+  color: #666;
+  margin-top: 24px;
+}
+

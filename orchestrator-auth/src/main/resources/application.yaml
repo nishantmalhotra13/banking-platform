@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: orchestrator-auth
+  datasource:
+    url: jdbc:postgresql://localhost:5435/auth_db
+    username: auth_user
+    password: auth_pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+auth:
+  jwt:
+    secret: ThisIsAVeryLongSecretKeyForHS256AlgorithmMustBe32BytesOrMore!!
+    expiration-ms: 3600000
+
+server:
+  port: 8085
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

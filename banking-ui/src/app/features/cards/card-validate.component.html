@@ -1,0 +1,24 @@
+<h1>Validate Card</h1>
+
+<div class="validate-row">
+  <mat-form-field appearance="outline" class="card-input">
+    <mat-label>Card Number</mat-label>
+    <input matInput [(ngModel)]="cardNumber" (keyup.enter)="validate()">
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="validate()" [disabled]="loading">Validate</button>
+</div>
+
+<mat-card *ngIf="result" class="result-card" [class.valid]="result.valid" [class.invalid]="!result.valid">
+  <div class="result-icon">
+    <mat-icon *ngIf="result.valid" class="valid-icon">check_circle</mat-icon>
+    <mat-icon *ngIf="!result.valid" class="invalid-icon">cancel</mat-icon>
+  </div>
+  <h2>{{ result.valid ? 'Card is Valid' : 'Card Not Found' }}</h2>
+  <div *ngIf="result.valid && result.card" class="card-details">
+    <p><strong>Type:</strong> {{ result.card.cardType }}</p>
+    <p><strong>Category:</strong> {{ result.card.cardCategory }}</p>
+    <p><strong>Status:</strong> {{ result.card.cardStatus }}</p>
+    <p><strong>Issuer:</strong> {{ result.card.issuerBank }}</p>
+  </div>
+</mat-card>
+

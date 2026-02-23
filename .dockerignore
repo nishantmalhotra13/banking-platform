@@ -1,0 +1,10 @@
+.gradle/
+.idea/
+build/
+*/build/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+banking-ui/node_modules/
+banking-ui/dist/
+.git/
+

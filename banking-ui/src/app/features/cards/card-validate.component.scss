@@ -1,0 +1,43 @@
+.validate-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.card-input {
+  width: 400px;
+}
+
+.result-card {
+  margin-top: 24px;
+  padding: 24px;
+  text-align: center;
+
+  &.valid {
+    border-left: 4px solid green;
+  }
+
+  &.invalid {
+    border-left: 4px solid red;
+  }
+}
+
+.valid-icon {
+  color: green;
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+}
+
+.invalid-icon {
+  color: red;
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+}
+
+.card-details {
+  text-align: left;
+  margin-top: 16px;
+}
+

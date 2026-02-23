@@ -1,0 +1,40 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.banking'
+version = '0.0.1-SNAPSHOT'
+description = 'End-to-End functional tests — runs against the full cluster'
+
+// Disable bootJar — this is a test-only module
+tasks.named('jar') { enabled = true }
+
+dependencies {
+	testImplementation 'io.rest-assured:rest-assured:5.5.0'
+	testImplementation 'io.rest-assured:json-path:5.5.0'
+	testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+	testImplementation 'org.assertj:assertj-core:3.27.3'
+	testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+	testImplementation 'org.awaitility:awaitility:4.2.2'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// E2E tests should not run during normal `./gradlew test`
+// Run explicitly with: ./gradlew :e2e-tests:test
+tasks.named('test') {
+	// Gateway base URL — configurable via env or system property
+	systemProperty 'e2e.gateway.url', System.getProperty('e2e.gateway.url', 'http://localhost:8080')
+	systemProperty 'e2e.auth.url', System.getProperty('e2e.auth.url', 'http://localhost:8085')
+	systemProperty 'e2e.orchestrator.url', System.getProperty('e2e.orchestrator.url', 'http://localhost:8086')
+	systemProperty 'e2e.mdm.url', System.getProperty('e2e.mdm.url', 'http://localhost:8084')
+	systemProperty 'e2e.ccsl.url', System.getProperty('e2e.ccsl.url', 'http://localhost:8082')
+
+	useJUnitPlatform()
+
+	testLogging {
+		events 'passed', 'failed', 'skipped', 'standardOut', 'standardError'
+		showStandardStreams = true
+	}
+}
+

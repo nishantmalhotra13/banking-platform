@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MdmAuth [local]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="banking-platform.mdm-auth.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.banking.platform.auth.mdm.MdmAuthApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
+
