@@ -1,0 +1,127 @@
+# ---------- PostgreSQL MDM ----------
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-mdm
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-mdm
+  template:
+    metadata:
+      labels:
+        app: postgres-mdm
+    spec:
+      containers:
+        - name: postgres-mdm
+          image: {{ .Values.infra.postgresmdm.image }}
+          ports:
+            - containerPort: {{ .Values.infra.postgresmdm.port }}
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.infra.postgresmdm.dbName }}
+            - name: POSTGRES_USER
+              value: {{ .Values.infra.postgresmdm.dbUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.infra.postgresmdm.dbPass }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-mdm
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-mdm
+  ports:
+    - port: {{ .Values.infra.postgresmdm.port }}
+      targetPort: {{ .Values.infra.postgresmdm.port }}
+# ---------- PostgreSQL CCSL ----------
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-ccsl
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-ccsl
+  template:
+    metadata:
+      labels:
+        app: postgres-ccsl
+    spec:
+      containers:
+        - name: postgres-ccsl
+          image: {{ .Values.infra.postgresccsl.image }}
+          ports:
+            - containerPort: {{ .Values.infra.postgresccsl.port }}
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.infra.postgresccsl.dbName }}
+            - name: POSTGRES_USER
+              value: {{ .Values.infra.postgresccsl.dbUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.infra.postgresccsl.dbPass }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ccsl
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-ccsl
+  ports:
+    - port: {{ .Values.infra.postgresccsl.port }}
+      targetPort: {{ .Values.infra.postgresccsl.port }}
+# ---------- PostgreSQL Auth ----------
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-auth
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-auth
+  template:
+    metadata:
+      labels:
+        app: postgres-auth
+    spec:
+      containers:
+        - name: postgres-auth
+          image: {{ .Values.infra.postgresauth.image }}
+          ports:
+            - containerPort: {{ .Values.infra.postgresauth.port }}
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.infra.postgresauth.dbName }}
+            - name: POSTGRES_USER
+              value: {{ .Values.infra.postgresauth.dbUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.infra.postgresauth.dbPass }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-auth
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-auth
+  ports:
+    - port: {{ .Values.infra.postgresauth.port }}
+      targetPort: {{ .Values.infra.postgresauth.port }}
+

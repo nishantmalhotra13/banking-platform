@@ -17,11 +17,32 @@ spec:
       labels:
         app: {{ $name }}-auth
     spec:
+      {{- if $auth.waitFor }}
+      initContainers:
+        - name: wait-for-deps
+          image: busybox:1.36
+          command: ['sh', '-c']
+          args:
+            - |
+              {{- range $auth.waitFor }}
+              echo "Waiting for {{ .host }}:{{ .port }} ..."
+              until nc -z {{ .host }} {{ .port }}; do sleep 2; done
+              echo "{{ .host }}:{{ .port }} is up!"
+              {{- end }}
+      {{- end }}
       containers:
         - name: {{ $name }}-auth
           image: {{ $auth.image }}
+          imagePullPolicy: {{ $.Values.imagePullPolicy }}
           ports:
             - containerPort: {{ $auth.port }}
+          {{- if $auth.env }}
+          env:
+            {{- range $key, $val := $auth.env }}
+            - name: {{ $key }}
+              value: "{{ $val }}"
+            {{- end }}
+          {{- end }}
           resources:
             requests:
               cpu: {{ $.Values.resources.requests.cpu }}
@@ -29,11 +50,18 @@ spec:
             limits:
               cpu: {{ $.Values.resources.limits.cpu }}
               memory: {{ $.Values.resources.limits.memory }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ $auth.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: {{ $auth.port }}
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
             periodSeconds: 10
 ---
 apiVersion: v1

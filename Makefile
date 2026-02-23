@@ -1,7 +1,7 @@
 .PHONY: clean build test docker-build docker-up docker-down docker-logs docker-prune \
        infra-up infra-down local-run local-stop \
        ui-install ui-dev ui-build ui-test \
-       helm-install helm-uninstall helm-upgrade \
+       docker-push helm-install helm-uninstall helm-upgrade helm-deploy helm-status \
        e2e e2e-full all kibana check-ports status swagger-export
 
 # Project name used by docker compose (auto-derived from folder, but we pin it)
@@ -157,14 +157,49 @@ ui-test:
 # Helm
 # ---------------------------------------------------------------
 
+DOCKER_USER := nishantmalhotra1
+
+docker-push: docker-build
+	@echo "🏷️  Tagging and pushing images to Docker Hub ($(DOCKER_USER))..."
+	@for svc in api-gateway orchestrator-service mdm-service ccsl-service orchestrator-auth mdm-auth ccsl-auth; do \
+		docker tag "banking-platform-$${svc}:latest" "$(DOCKER_USER)/banking-platform-$${svc}:latest"; \
+		docker push "$(DOCKER_USER)/banking-platform-$${svc}:latest"; \
+	done
+	@docker build -f banking-ui/Dockerfile -t $(DOCKER_USER)/banking-platform-ui:latest .
+	@docker push $(DOCKER_USER)/banking-platform-ui:latest
+	@echo "✅ All images pushed to docker.io/$(DOCKER_USER)"
+
 helm-install:
 	helm install banking-platform ./helm/banking-platform
 
 helm-uninstall:
 	helm uninstall banking-platform
+	kubectl delete namespace banking-platform --ignore-not-found
 
 helm-upgrade:
 	helm upgrade banking-platform ./helm/banking-platform
+
+helm-deploy: docker-push helm-uninstall
+	@echo "⏳ Waiting for namespace cleanup..."
+	@sleep 10
+	helm install banking-platform ./helm/banking-platform
+	@echo ""
+	@echo "✅ Banking Platform deployed on Kubernetes!"
+	@echo ""
+	@echo "   🌐 UI:       http://localhost:30042"
+	@echo "   🚪 Gateway:  http://localhost:30080"
+	@echo "   📖 Swagger:  http://localhost:30080/swagger-ui.html"
+	@echo ""
+
+helm-status:
+	@echo "📦 Helm Release:"
+	@helm list -A
+	@echo ""
+	@echo "📦 Pods:"
+	@kubectl get pods -n banking-platform
+	@echo ""
+	@echo "📦 Services:"
+	@kubectl get svc -n banking-platform
 
 # ---------------------------------------------------------------
 # E2E Tests (requires cluster running)

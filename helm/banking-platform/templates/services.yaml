@@ -17,11 +17,32 @@ spec:
       labels:
         app: {{ $name }}-service
     spec:
+      {{- if $svc.waitFor }}
+      initContainers:
+        - name: wait-for-deps
+          image: busybox:1.36
+          command: ['sh', '-c']
+          args:
+            - |
+              {{- range $svc.waitFor }}
+              echo "Waiting for {{ .host }}:{{ .port }} ..."
+              until nc -z {{ .host }} {{ .port }}; do sleep 2; done
+              echo "{{ .host }}:{{ .port }} is up!"
+              {{- end }}
+      {{- end }}
       containers:
         - name: {{ $name }}-service
           image: {{ $svc.image }}
+          imagePullPolicy: {{ $.Values.imagePullPolicy }}
           ports:
             - containerPort: {{ $svc.port }}
+          {{- if $svc.env }}
+          env:
+            {{- range $key, $val := $svc.env }}
+            - name: {{ $key }}
+              value: "{{ $val }}"
+            {{- end }}
+          {{- end }}
           resources:
             requests:
               cpu: {{ $.Values.resources.requests.cpu }}
@@ -29,17 +50,24 @@ spec:
             limits:
               cpu: {{ $.Values.resources.limits.cpu }}
               memory: {{ $.Values.resources.limits.memory }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ $svc.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: {{ $svc.port }}
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: {{ $svc.port }}
-            initialDelaySeconds: 60
+            initialDelaySeconds: 10
             periodSeconds: 15
 ---
 apiVersion: v1
@@ -58,5 +86,8 @@ spec:
   ports:
     - port: {{ $svc.port }}
       targetPort: {{ $svc.port }}
+      {{- if eq $name "gateway" }}
+      nodePort: 30080
+      {{- end }}
 {{- end }}
 

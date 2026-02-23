@@ -2,43 +2,98 @@
 
 namespace: banking-platform
 
+# Docker Hub username — images are at docker.io/<dockerUser>/banking-platform-<svc>
+dockerUser: nishantmalhotra1
+
+# Set to Never for local images, Always/IfNotPresent for registry
+imagePullPolicy: IfNotPresent
+
+# ---------------------------------------------------------------
+# Business Services
+# ---------------------------------------------------------------
 services:
   orchestrator:
-    replicas: 2
+    replicas: 1
     port: 8086
-    image: banking-platform/orchestrator-service:latest
+    image: nishantmalhotra1/banking-platform-orchestrator-service:latest
+    waitFor:
+      - host: redis
+        port: 6379
+    env:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_REDIS_HOST: redis
+      DOWNSTREAM_MDM_BASE_URL: http://mdm-service:8084
+      DOWNSTREAM_CCSL_BASE_URL: http://ccsl-service:8082
   mdm:
-    replicas: 2
+    replicas: 1
     port: 8084
-    image: banking-platform/mdm-service:latest
+    image: nishantmalhotra1/banking-platform-mdm-service:latest
+    waitFor:
+      - host: postgres-mdm
+        port: 5432
+    env:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-mdm:5432/mdm_db
+      SPRING_DATASOURCE_USERNAME: mdm_user
+      SPRING_DATASOURCE_PASSWORD: mdm_pass
   ccsl:
-    replicas: 2
+    replicas: 1
     port: 8082
-    image: banking-platform/ccsl-service:latest
+    image: nishantmalhotra1/banking-platform-ccsl-service:latest
+    waitFor:
+      - host: postgres-ccsl
+        port: 5432
+    env:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-ccsl:5432/ccsl_db
+      SPRING_DATASOURCE_USERNAME: ccsl_user
+      SPRING_DATASOURCE_PASSWORD: ccsl_pass
   gateway:
     replicas: 1
     port: 8080
-    image: banking-platform/api-gateway:latest
+    image: nishantmalhotra1/banking-platform-api-gateway:latest
+    env:
+      SPRING_PROFILES_ACTIVE: docker
 
+# ---------------------------------------------------------------
+# Auth Services
+# ---------------------------------------------------------------
 auth:
   orchestrator:
     replicas: 1
     port: 8085
-    image: banking-platform/orchestrator-auth:latest
+    image: nishantmalhotra1/banking-platform-orchestrator-auth:latest
+    waitFor:
+      - host: postgres-auth
+        port: 5432
+    env:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_pass
   mdm:
     replicas: 1
     port: 8083
-    image: banking-platform/mdm-auth:latest
+    image: nishantmalhotra1/banking-platform-mdm-auth:latest
+    env:
+      SPRING_PROFILES_ACTIVE: docker
   ccsl:
     replicas: 1
     port: 8081
-    image: banking-platform/ccsl-auth:latest
+    image: nishantmalhotra1/banking-platform-ccsl-auth:latest
+    env:
+      SPRING_PROFILES_ACTIVE: docker
 
+# ---------------------------------------------------------------
+# UI
+# ---------------------------------------------------------------
 ui:
   replicas: 1
-  port: 80
-  image: banking-platform/banking-ui:latest
+  image: nishantmalhotra1/banking-platform-ui:latest
 
+# ---------------------------------------------------------------
+# Infrastructure
+# ---------------------------------------------------------------
 infra:
   redis:
     replicas: 1
@@ -63,6 +118,9 @@ infra:
     dbUser: auth_user
     dbPass: auth_pass
 
+# ---------------------------------------------------------------
+# Resource limits
+# ---------------------------------------------------------------
 resources:
   requests:
     cpu: 250m
